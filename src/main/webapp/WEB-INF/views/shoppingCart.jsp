@@ -25,7 +25,7 @@
 
 	<c:if test="${empty cartForm or empty cartForm.cartLineInfos}">
 		<h2>There is no items in Cart</h2>
-		<a href="${contextPath}/productList">Show Product List</a>
+		<a href="${contextPath}/product/list">Show Product List</a>
 	</c:if>
 
 	<c:if test="${not empty cartForm and not empty cartForm.cartLineInfos}">

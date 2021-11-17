@@ -17,7 +17,7 @@
 	<div class="menu-container">
 
 		<a href="${contextPath}/">Home</a> | <a
-			href="${contextPath}/productList">Product List</a> | <a
+			href="${contextPath}/product/list">Product List</a> | <a
 			href="${contextPath}/shoppingCart">My Cart</a> |
 		<security:authorize
 			access="hasAnyRole('ROLE_MANAGER','ROLE_EMPLOYEE')">
