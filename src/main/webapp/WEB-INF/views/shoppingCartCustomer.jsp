@@ -18,6 +18,7 @@
 	<jsp:include page="_header.jsp" />
 
 	<jsp:include page="_menu.jsp" />
+	
 
 	<div class="page-title">Enter Customer Information</div>
 
@@ -52,7 +53,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td><input type="submit" value="Submit" />
-				<input type="reset" value="Reset"></td>
+				<input type="reset" value="Reset" onclick="customReset();"></td>
 				
 				</tr>
 				
