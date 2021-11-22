@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.shoppingcart.dao.OrderDAO;
 import com.shoppingcart.dao.ProductDAO;
 import com.shoppingcart.entity.Product;
 import com.shoppingcart.model.CartInfo;
@@ -29,6 +30,9 @@ public class MainController {
 
 	@Autowired
 	private ProductDAO productDAO;
+
+	@Autowired
+	private OrderDAO orderDAO;
 
 	@Autowired
 	private CustomerInfoValidator customerInfoValidator;
@@ -146,18 +150,53 @@ public class MainController {
 		cartInfo.setCustomerInfo(customerForm);
 		return "redirect:/shoppingCartConfirmation";
 	}
-	
+
 	@RequestMapping(value = { "/shoppingCartConfirmation" }, method = RequestMethod.GET)
 	public String shoppingCartConfirmationReview(HttpServletRequest request, Model model) {
 		CartInfo cartInfo = Utils.getCartInfoInSession(request);
-		
-		if(cartInfo.isEmpty()) {
+
+		if (cartInfo.isEmpty()) {
 			return "redirect:/shoppingCart";
 		} else if (!cartInfo.isValidCustomer()) {
 			return "redirect:/shoppingCartCustomer";
 		}
-		
+
 		return "shoppingCartConfirmation";
+	}
+
+	@RequestMapping(value = { "/shoppingCartConfirmation" }, method = RequestMethod.POST)
+	public String shoppingCartConfirmationSave(HttpServletRequest request, Model model) {
+		CartInfo cartInfo = Utils.getCartInfoInSession(request);
+
+		if (cartInfo.isEmpty()) {
+			return "redirect:/shoppingCart";
+		} else if (!cartInfo.isValidCustomer()) {
+			return "redirect:/shoppingCartCustomer";
+		}
+
+		try {
+			orderDAO.saveOrder(cartInfo);
+
+		} catch (Exception e) {
+			return "shoppingCartConfirmation";
+		}
+
+		Utils.removeCartInfoInSession(request);
+
+		Utils.storeLastOrderedCartInfoInSession(request, cartInfo);
+
+		return "redirect:/shoppingCartFinalize";
+	}
+
+	@RequestMapping(value = { "/shoppingCartFinalize" }, method = RequestMethod.GET)
+	public String shoppingCartFinalize(HttpServletRequest request, Model model) {
+		CartInfo lastOrderedCart = Utils.getLastOrderedCartInfoInSession(request);
+
+		if (lastOrderedCart == null) {
+			return "redirect:/shoppingCart";
+		}
+
+		return "shoppingCartFinalize";
 	}
 
 }
