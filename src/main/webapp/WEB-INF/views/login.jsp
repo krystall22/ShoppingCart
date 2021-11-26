@@ -31,7 +31,7 @@
 			<table>
 				<tr>
 					<td>User Name *</td>
-					<td><input name="userName" /></td>
+					<td><input name="username" /></td>
 				</tr>
 
 				<tr>

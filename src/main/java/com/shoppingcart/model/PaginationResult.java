@@ -99,7 +99,7 @@ public class PaginationResult<E> {
 	public PaginationResult(Query query, int page, int maxResult, int maxNavigationPage) {
 
 		int pageIndex = page - 1 < 0 ? 0 : page - 1;
-		int fromRecordIndex = pageIndex * maxResult;
+		int fromRecordIndex = pageIndex * maxResult; //0*5
 		int maxRecordIndex = fromRecordIndex + maxResult;
 
 		ScrollableResults resultScroll = query.scroll(ScrollMode.SCROLL_INSENSITIVE);
@@ -112,6 +112,7 @@ public class PaginationResult<E> {
 			hasResult = resultScroll.scroll(fromRecordIndex);
 			if (hasResult) {
 				do {
+					int rowNumber = resultScroll.getRowNumber();
 					E record = (E) resultScroll.get(0);
 					results.add(record);
 
@@ -121,7 +122,7 @@ public class PaginationResult<E> {
 			resultScroll.last();
 		}
 
-		this.totalPages = resultScroll.getRowNumber() + 1;
+		this.totalRecords = resultScroll.getRowNumber() + 1;
 		this.currentPage = pageIndex + 1;
 		this.list = results;
 		this.maxResult = maxResult;
