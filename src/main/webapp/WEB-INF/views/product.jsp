@@ -9,6 +9,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Product</title>
+<style type="text/css">
+<%@include file="css/styles.css" %> 
+</style>
 </head>
 <body>
 	<jsp:include page="_header.jsp" />
@@ -61,7 +64,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td><input type="submit" value="Submit" /> <input type="reset"
-					value="Reset" /></td>
+					value="Reset" onclick="customReset();" /></td>
 			</tr>
 		</table>
 

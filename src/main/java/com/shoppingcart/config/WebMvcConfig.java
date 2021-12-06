@@ -15,8 +15,8 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"com.shoppingcart.*"})
-public class WebMvcConfig implements WebMvcConfigurer{
+@ComponentScan(basePackages = { "com.shoppingcart.*" })
+public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Bean
 	public InternalResourceViewResolver resolver() {
@@ -26,7 +26,7 @@ public class WebMvcConfig implements WebMvcConfigurer{
 		resolver.setSuffix(".jsp");
 		return resolver;
 	}
- 
+
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -41,10 +41,16 @@ public class WebMvcConfig implements WebMvcConfigurer{
 		localValidatorFactoryBean.setValidationMessageSource(messageSource());
 		return localValidatorFactoryBean;
 	}
-	
+
 	@Bean(name = "multipartResolver")
 	public CommonsMultipartResolver multipartResolver() {
-		CommonsMultipartResolver commonsMultipartResolver =new CommonsMultipartResolver();
+		CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
 		return commonsMultipartResolver;
+	}
+
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/css/**").addResourceLocations("/css/").setCachePeriod(31556926);
+		registry.addResourceHandler("/img/**").addResourceLocations("/img/").setCachePeriod(31556926);
+		registry.addResourceHandler("/javascript/**").addResourceLocations("/javascript/").setCachePeriod(31556926);
 	}
 }

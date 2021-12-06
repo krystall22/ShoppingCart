@@ -2,6 +2,8 @@ package com.shoppingcart.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,12 +16,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.shoppingcart.dao.AccountDAO;
 import com.shoppingcart.dao.OrderDAO;
 import com.shoppingcart.dao.ProductDAO;
+import com.shoppingcart.entity.Account;
+import com.shoppingcart.entity.Product;
+import com.shoppingcart.model.AccountInfo;
+import com.shoppingcart.model.CartInfo;
 import com.shoppingcart.model.OrderDetailInfo;
 import com.shoppingcart.model.OrderInfo;
 import com.shoppingcart.model.PaginationResult;
 import com.shoppingcart.model.ProductInfo;
+import com.shoppingcart.util.Utils;
+import com.shoppingcart.validator.AccountInfoValidator;
 import com.shoppingcart.validator.ProductInfoValidator;
 
 @Controller
@@ -33,6 +42,14 @@ public class AdminController {
 
 	@Autowired
 	private ProductInfoValidator productInfoValidator;
+
+	// newly added
+	@Autowired
+	private AccountDAO accountDAO;
+	
+	//newly added
+	@Autowired
+	private AccountInfoValidator accountInfoValidator;
 
 	@RequestMapping("/403")
 	public String accessDenied() {
@@ -124,4 +141,69 @@ public class AdminController {
 		}
 		return "redirect:/product/list";
 	}
+
+	// newly added
+	@RequestMapping(value = { "/accountList" }, method = RequestMethod.GET)
+	public String accountList(Model model, @RequestParam(value = "page", defaultValue = "1") String pageStr) {
+		int page = 1;
+		try {
+			page = Integer.parseInt(pageStr);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+		final int MAX_RESULT = 5;
+		final int MAX_NAVIGATION_PAGE = 10;
+		PaginationResult<AccountInfo> paginationAccountInfos = accountDAO.getAllAccountInfos(page, MAX_RESULT,
+				MAX_NAVIGATION_PAGE);
+		model.addAttribute("paginationAccountInfos", paginationAccountInfos);
+		return "accountList";
+	}
+
+	// newly added
+	@RequestMapping(value = { "/account" }, method = RequestMethod.GET)
+	public String account(Model model, @RequestParam(value = "username", defaultValue = "") String username) {
+		Account account = null;
+		if (username != null) {
+			account = accountDAO.getAccountByUserName(username);
+		}
+		if (account == null) {
+			account = new Account();
+		}
+		model.addAttribute("accountForm", account);
+		return "account";
+	}
+	
+	//newly added
+	@RequestMapping(value = { "/account" }, method = RequestMethod.POST)
+	public String productSave(Model model, @ModelAttribute("accountForm") @Validated AccountInfo accountInfo,
+			BindingResult result) {
+		accountInfoValidator.validate(accountInfo, result);
+		if (result.hasErrors()) {
+			return "account";
+		}
+		try {
+			accountDAO.saveAccountInfo(accountInfo);
+		} catch (Exception e) {
+			model.addAttribute("errorMessage", e.getMessage());
+			return "account";
+		}
+		return "redirect:/accountList";
+	}
+	
+	//newly added
+		@RequestMapping({ "/removeAccount" })
+		public String removeAccountHandler(HttpServletRequest request, Model model,
+				@RequestParam(value = "username", defaultValue = "") String username) {
+			Account account = null;
+
+			if (username != null) {
+				account = accountDAO.getAccountByUserName(username);
+			}
+
+			if (account != null) {
+				accountDAO.removeAccountByUsername(username);
+			}
+			return "redirect:/accountList";
+		}
 }

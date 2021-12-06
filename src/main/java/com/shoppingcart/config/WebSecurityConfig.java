@@ -1,5 +1,7 @@
 package com.shoppingcart.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -8,13 +10,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.shoppingcart.authentication.MyDBAuthenticationService;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	// @Autowired
-	// @Qualifier("userDetailsServiceImpl")
-	// private UserDetailsService userDetailsService;
+	@Autowired
+	@Qualifier("myDBAuthenticationService")
+	private MyDBAuthenticationService myDBAuthenticationService;
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -32,23 +36,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/403");
 
-		http.authorizeRequests().and().formLogin().loginProcessingUrl("/j_spring_security_check")
-		.loginPage("/login")
-		.defaultSuccessUrl("/accountInfo")
-		.failureUrl("/login?error=true")
-		.usernameParameter("username")
-		.passwordParameter("password")
-		.and()
-		.logout()
-		.logoutUrl("/logout")
-		.logoutSuccessUrl("/");
+		http.authorizeRequests().and().formLogin().loginProcessingUrl("/j_spring_security_check").loginPage("/login")
+				.defaultSuccessUrl("/accountInfo").failureUrl("/login?error=true").usernameParameter("username")
+				.passwordParameter("password").and().logout().logoutUrl("/logout").logoutSuccessUrl("/");
 	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("employee").password("employee").authorities("ROLE_EMPLOYEE");
-		auth.inMemoryAuthentication().withUser("manager").password("manager").authorities("ROLE_MANAGER");
+		// auth.inMemoryAuthentication().withUser("employee").password("employee").authorities("ROLE_EMPLOYEE");
+		// auth.inMemoryAuthentication().withUser("manager").password("manager").authorities("ROLE_MANAGER");
 		// auth.authenticationProvider(authProvider());
+		//auth.userDetailsService(myDBAuthenticationService);
 	}
 
 	/*
